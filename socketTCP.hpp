@@ -9,6 +9,7 @@
 
 #define IP_DHCP "0.0.0.0"
 #define MAX_CONN 50
+#define MAX_DIM 4096
 
 class SocketTCP
 {
@@ -41,6 +42,8 @@ class Connessione
 {
     private:
     public:
+        bool invia(int id, char* msg);
+        char* ricevi(int id);
 };
 
 class ClientConnessione : public Connessione
@@ -55,20 +58,11 @@ class ServerConnessione : public Connessione
     public:
 };
 
-class Address
-{
-    private:
-    public:
-};
 
 
 
 
-
-
-
-
-
+//funzione errore generica
 void errore(char* typeErr, int livErr)
 {
     printf("ERROR on: %s", typeErr);
@@ -122,4 +116,32 @@ void ServerTCP::accetta()
     int lenAddr = sizeof(struct sockaddr);
     connId = accept(SocketTCP::getSocketId(), (struct sockaddr*)&clientAddr, (socklen_t)&lenAddr);
     if(connId <= 0) errore("accept()", -4);
+}
+
+//ClientTCP
+
+
+//Connessione
+bool Connessione::invia(int id, char* msg)
+{
+    int lenMsg = strlen(msg);
+    int rc = send(id, msg, lenMsg, 0);
+    if(rc != lenMsg)
+    {
+        errore("send()", -5);
+    }else{
+        return true;
+    }
+}
+
+char* Connessione::ricevi(int id)
+{
+    char buffer[MAX_DIM+1];
+    int ret = recv(id, buffer, MAX_DIM, 0);
+    if(ret <= 0){
+        errore("recv()", -6);
+    }else{
+        buffer[ret] = '\0';
+        return strdup(buffer);
+    }
 }
