@@ -61,12 +61,19 @@ class Address
     public:
 };
 
+
+
+
+
+
+
+
+
 void errore(char* typeErr, int livErr)
 {
     printf("ERROR on: %s", typeErr);
     exit(livErr);
 }
-
 
 //SocketTCP
 SocketTCP::SocketTCP(int port)
@@ -111,5 +118,8 @@ void ServerTCP::createServer()
 
 void ServerTCP::accetta()
 {
-    
+    struct sockaddr_in clientAddr;
+    int lenAddr = sizeof(struct sockaddr);
+    connId = accept(SocketTCP::getSocketId(), (struct sockaddr*)&clientAddr, (socklen_t)&lenAddr);
+    if(connId <= 0) errore("accept()", -4);
 }
