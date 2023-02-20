@@ -40,7 +40,6 @@ class ClientTCP : public SocketTCP
 
 class Connessione
 {
-    private:
     public:
         bool invia(int id, char* msg);
         char* ricevi(int id);
@@ -48,13 +47,13 @@ class Connessione
 
 class ClientConnessione : public Connessione
 {
-    private:
     public:
+        int shutdown();
+
 };
 
 class ServerConnessione : public Connessione
 {
-    private:
     public:
 };
 
@@ -144,4 +143,9 @@ char* Connessione::ricevi(int id)
         buffer[ret] = '\0';
         return strdup(buffer);
     }
+}
+
+int ClientConnessione::shutdown()
+{
+    int rc = shutdown( )
 }
