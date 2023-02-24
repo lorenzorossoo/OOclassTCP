@@ -37,6 +37,9 @@ class ClientTCP : public SocketTCP
 {
     private:
     public:
+        void createConnection();
+        char* comunication(char* msg);
+        bool closeComunication();
 };
 
 class Connessione
@@ -49,15 +52,16 @@ class Connessione
 class ClientConnessione : public Connessione
 {
     public:
-        int shutdown();
-
+        bool invia(int socketId, char* msg);
+        char* ricevi(int socketId);
+        bool closeConnection(int socketId);
 };
 
 class ServerConnessione : public Connessione
 {
     public:
         bool invia(int connId, char* msg);
-        char* ricevi();
+        char* ricevi(int connId);
 };
 
 
@@ -125,10 +129,28 @@ char* ServerTCP::startServer(char* msg)
     ServerConnessione sc;
     bool stateInvia = sc.invia(connId, msg);
     if(stateInvia==false) errore("invia()", -7);
-    return sc.ricevi();
+    return sc.ricevi(connId);
 }
 
 //ClientTCP
+void ClientTCP::createConnection()
+{
+    int rc = connect(getSocketId(), (struct sockaddr*)&getServerAddr(), sizeof(getServerAddr()));
+    if(rc < 0) errore("Connect()", -8);
+}
+
+char* ClientTCP::comunication(char* msg)
+{
+    ClientConnessione cc;
+    cc.invia(getSocketId(), msg);
+    return cc.ricevi(getSocketId());
+}
+
+bool ClientTCP::closeComunication()
+{
+    ClientConnessione cc;
+    cc.closeConnection(getSocketId());
+}
 
 //Connessione
 bool Connessione::invia(int id, char* msg)
@@ -161,7 +183,25 @@ bool ServerConnessione::invia(int connId, char* msg)
     return c.invia(connId, msg);
 }
 
-int ClientConnessione::shutdown()
+char* ServerConnessione::ricevi(int connId)
 {
-    int rc = shutdown(, SHUT_RDWR);
+    Connessione c;
+    return c.ricevi(connId);
+}
+
+bool ClientConnessione::invia(int socketId, char* msg)
+{  
+    Connessione c;
+    return c.invia(socketId, msg);
+}
+
+char* ClientConnessione::ricevi(int socketId)
+{
+    Connessione c;
+    return c.ricevi(socketId);
+}
+
+bool ClientConnessione::closeConnection(int socketId)
+{
+    return shutdown(socketId, SHUT_RDWR);
 }
