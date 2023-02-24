@@ -30,6 +30,7 @@ class ServerTCP : public SocketTCP
     public:
         void createServer();
         void accetta();
+        char* startServer(char* msg);
 };
 
 class ClientTCP : public SocketTCP
@@ -55,6 +56,8 @@ class ClientConnessione : public Connessione
 class ServerConnessione : public Connessione
 {
     public:
+        bool invia(int connId, char* msg);
+        char* ricevi();
 };
 
 
@@ -117,8 +120,15 @@ void ServerTCP::accetta()
     if(connId <= 0) errore("accept()", -4);
 }
 
-//ClientTCP
+char* ServerTCP::startServer(char* msg)
+{
+    ServerConnessione sc;
+    bool stateInvia = sc.invia(connId, msg);
+    if(stateInvia==false) errore("invia()", -7);
+    return sc.ricevi();
+}
 
+//ClientTCP
 
 //Connessione
 bool Connessione::invia(int id, char* msg)
@@ -145,7 +155,13 @@ char* Connessione::ricevi(int id)
     }
 }
 
+bool ServerConnessione::invia(int connId, char* msg)
+{  
+    Connessione c;
+    return c.invia(connId, msg);
+}
+
 int ClientConnessione::shutdown()
 {
-    int rc = shutdown( )
+    int rc = shutdown(, SHUT_RDWR);
 }
