@@ -120,7 +120,7 @@ void ServerTCP::accetta()
 {
     struct sockaddr_in clientAddr;
     int lenAddr = sizeof(struct sockaddr);
-    connId = accept(SocketTCP::getSocketId(), (struct sockaddr*)&clientAddr, (socklen_t)&lenAddr);
+    connId = accept(SocketTCP::getSocketId(), (struct sockaddr*)&clientAddr, (socklen_t*)&lenAddr);
     if(connId <= 0) errore("accept()", -4);
 }
 
@@ -135,7 +135,8 @@ char* ServerTCP::startServer(char* msg)
 //ClientTCP
 void ClientTCP::createConnection()
 {
-    int rc = connect(getSocketId(), (struct sockaddr*)&getServerAddr(), sizeof(getServerAddr()));
+    struct sockaddr_in serv = getServerAddr();
+    int rc = connect(getSocketId(), (struct sockaddr*)&serv, sizeof(serv));
     if(rc < 0) errore("Connect()", -8);
 }
 
